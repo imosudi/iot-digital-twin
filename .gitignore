@@ -3,6 +3,12 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Local environments and frontend dependencies
+.venv/
+node_modules/
+.env
+*.tsbuildinfo
+
 # C extensions
 *.so
 

@@ -1,0 +1,20 @@
+{
+  "type": "battery",
+  "version": "1.0",
+  "display_name": "Battery",
+  "description": "Configurable energy storage entity.",
+  "properties": {
+    "chemistry": { "type": "string", "required": true },
+    "nominal_capacity": { "type": "number", "unit": "kWh", "required": true },
+    "nominal_voltage": { "type": "number", "unit": "V" }
+  },
+  "telemetry": {
+    "soc": { "type": "number", "unit": "%" },
+    "soh": { "type": "number", "unit": "%" },
+    "voltage": { "type": "number", "unit": "V" },
+    "power": { "type": "number", "unit": "kW" },
+    "temperature": { "type": "number", "unit": "C" }
+  },
+  "capabilities": ["telemetry", "energy_storage"],
+  "commands": ["charge", "discharge", "standby"]
+}

@@ -1,0 +1,21 @@
+{
+  "type": "solar_pv",
+  "version": "1.0",
+  "display_name": "Solar PV Panel",
+  "description": "Schema-driven photovoltaic panel entity.",
+  "properties": {
+    "rated_power": { "type": "number", "unit": "kW", "required": true },
+    "panel_count": { "type": "number", "unit": "count" },
+    "efficiency": { "type": "number", "unit": "%" },
+    "orientation": { "type": "string" },
+    "tilt": { "type": "number", "unit": "deg" }
+  },
+  "telemetry": {
+    "irradiance": { "type": "number", "unit": "W/m2" },
+    "panel_temperature": { "type": "number", "unit": "C" },
+    "dc_power": { "type": "number", "unit": "kW" },
+    "energy": { "type": "number", "unit": "kWh" }
+  },
+  "capabilities": ["telemetry"],
+  "commands": []
+}
