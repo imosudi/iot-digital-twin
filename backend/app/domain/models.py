@@ -50,6 +50,7 @@ class DigitalEntity(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
+    site_id: str | None = None
     type: str
     name: str = Field(min_length=1)
     template: str
@@ -61,10 +62,40 @@ class DigitalEntity(BaseModel):
 
 
 class EntityCreate(BaseModel):
+    site_id: str | None = None
     type: str
     name: str = Field(min_length=1)
     template: str
     version: str
     description: str | None = None
     properties: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SiteCreate(BaseModel):
+    id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
+    name: str = Field(min_length=1)
+    description: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class Site(BaseModel):
+    id: str
+    name: str
+    description: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RelationshipCreate(BaseModel):
+    source_entity_id: str
+    target_entity_id: str
+    relationship_type: str = Field(min_length=1, pattern=r"^[a-z][a-z0-9_]*$")
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class Relationship(BaseModel):
+    id: str
+    source_entity_id: str
+    target_entity_id: str
+    relationship_type: str
     metadata: dict[str, Any] = Field(default_factory=dict)

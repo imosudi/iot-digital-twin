@@ -8,6 +8,7 @@ __pycache__/
 node_modules/
 .env
 *.tsbuildinfo
+*.db
 
 # C extensions
 *.so

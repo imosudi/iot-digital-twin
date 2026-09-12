@@ -26,6 +26,7 @@ class EntityRegistry:
         self._validate_properties(payload.properties, template)
         entity = DigitalEntity(
             id=payload.name.lower().replace(" ", "-"),
+            site_id=payload.site_id,
             type=payload.type,
             name=payload.name,
             template=payload.template,
