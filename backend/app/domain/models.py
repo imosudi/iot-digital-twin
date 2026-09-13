@@ -3,6 +3,60 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+# Canonical TwinField Domain Exports
+from app.domain.enums import (
+    AssetClass,
+    DataQuality,
+    HealthDerivationMethod,
+    TwinEventType,
+    TwinLifecycleStatus,
+)
+from app.domain.state import Provenance, StateVector, TwinState
+from app.domain.telemetry import TelemetryReading
+from app.domain.twin import (
+    Component,
+    DigitalTwin,
+    DigitalTwinCreate,
+    DigitalTwinUpdate,
+    LifecycleTransitionRequest,
+    Sensor,
+    TwinEvent,
+    TwinEventCreate,
+    TwinHealth,
+)
+
+__all__ = [
+    "DataType",
+    "TelemetryQuality",
+    "FieldDefinition",
+    "TelemetryDefinition",
+    "EntityTemplate",
+    "DigitalEntity",
+    "EntityCreate",
+    "SiteCreate",
+    "Site",
+    "RelationshipCreate",
+    "Relationship",
+    "TwinLifecycleStatus",
+    "AssetClass",
+    "DataQuality",
+    "HealthDerivationMethod",
+    "TwinEventType",
+    "Provenance",
+    "StateVector",
+    "TwinState",
+    "TelemetryReading",
+    "Sensor",
+    "Component",
+    "TwinHealth",
+    "TwinEvent",
+    "TwinEventCreate",
+    "DigitalTwin",
+    "DigitalTwinCreate",
+    "DigitalTwinUpdate",
+    "LifecycleTransitionRequest",
+]
+
 
 class DataType(StrEnum):
     BOOLEAN = "boolean"

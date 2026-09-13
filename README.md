@@ -1,34 +1,46 @@
-# IoT Digital Twin
+# TwinField — REGENOVA Digital Twin Sub-API
 
-Configurable IoT digital twin and telemetry platform. The initial implementation is intentionally small: it establishes the generic entity contract and a runnable API/UI boundary before adding persistence, telemetry adapters, simulation, and operations workflows.
+**TwinField** is the dedicated Digital Twin representation, synchronization, and interaction sub-API for the **REGENOVA** (Renewable Energy Asset Intelligence & Management Framework).
 
-## Quick start
+Target deployment: `https://twinfield.regenova.cloud/`
 
-### Backend
+## Architecture & Boundary
+
+TwinField maintains high-fidelity digital representations of heterogeneous renewable-energy assets (Solar PV, BESS, Wind Turbines, Inverters, Weather Stations, Grid Interconnects).
+
+- **Backend**: FastAPI 0.115+, SQLAlchemy 2.0, Alembic, Pydantic v2.
+- **Frontend**: React, Vite, Bootstrap 5.3.x (light control room studio shell).
+- **Persistence**: SQLite (development default) / PostgreSQL + TimescaleDB (production).
+- **Template System**: Versioned, schema-driven entity templates (`entity-definitions/`).
+
+## Quick Start
+
+### Backend (Default Port: 9000)
 
 ```bash
 cd backend
-python -m venv .venv
-. .venv/bin/activate
-pip install -e '.[dev]'
-uvicorn app.main:app --reload
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+alembic upgrade head
+uvicorn app.main:app --reload --host 0.0.0.0 --port 9000
 ```
 
-The API is available at `http://localhost:8000`; OpenAPI is at `/docs`.
+The API will be available at `http://localhost:9000`; interactive OpenAPI documentation is at `http://localhost:9000/docs`.
 
-### Frontend
+### Frontend Studio (Default Port: 5173)
 
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev -- --host 0.0.0.0 --port 5173
 ```
 
-## Repository map
+## Repository Structure
 
-- `backend/`: FastAPI service and domain contracts
-- `frontend/`: React/Vite studio shell
-- `entity-definitions/`: versioned, schema-driven entity templates
-- `docs/architecture/`: repository and architecture decisions
+- `backend/`: FastAPI application, domain contracts, persistence models, and tests.
+- `frontend/`: React/Vite/Bootstrap 5.3 studio shell.
+- `entity-definitions/`: Canonical schema definitions for renewable entities (e.g. `solar_pv`, `battery`).
+- `docs/`: Architectural decision records, roadmap, and forensic audit reports.
 
-See [ARCHITECTURE.md](ARCHITECTURE.md), [DEVELOPMENT.md](DEVELOPMENT.md), and [ROADMAP.md](ROADMAP.md) for the current boundary and next steps.
+See `ARCHITECTURE.md`, `DEVELOPMENT.md`, and `ROADMAP.md` for technical specifications.

@@ -1,6 +1,10 @@
+import time
+
 from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.domain.models import (
     DigitalEntity,
     EntityCreate,
@@ -11,6 +15,7 @@ from app.domain.models import (
     SiteCreate,
 )
 from app.persistence.database import SessionLocal, get_session, init_db
+from app.routers.twins import router as twins_router
 from app.services.persistence import (
     PersistenceError,
     create_relationship,
@@ -29,12 +34,47 @@ from app.services.persistence import (
 )
 from app.services.registry import EntityRegistry, RegistryError
 
-app = FastAPI(title="IoT Digital Twin API", version="0.1.0")
+app = FastAPI(
+    title="TwinField — REGENOVA Digital Twin API",
+    version="0.1.0",
+    description="Dedicated Digital Twin sub-API for the REGENOVA Framework.",
+)
+
+app.include_router(twins_router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.middleware("http")
+async def add_process_time_header(request, call_next):
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+    response.headers["X-Process-Time"] = f"{process_time:.6f}"
+    return response
+
+
 init_db()
 registry = EntityRegistry()
 with SessionLocal() as session:
     for template in load_templates(session):
         registry.register_template(template)
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {
+        "service": "TwinField Digital Twin API",
+        "status": "ok",
+        "version": "0.1.0",
+        "docs": "/docs",
+        "health": "/health",
+    }
 
 
 @app.get("/health")
@@ -85,9 +125,7 @@ def get_entities(
 
 
 @app.post("/api/v1/entities", response_model=DigitalEntity, status_code=status.HTTP_201_CREATED)
-def create_entity(
-    payload: EntityCreate, session: Session = Depends(get_session)
-) -> DigitalEntity:
+def create_entity(payload: EntityCreate, session: Session = Depends(get_session)) -> DigitalEntity:
     try:
         entity = registry.create_entity(payload)
         persisted_entity = save_entity(session, entity)
@@ -95,9 +133,10 @@ def create_entity(
         return persisted_entity
     except RegistryError as error:
         session.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(error)
-        ) from error
+        unprocessable_status = getattr(
+            status, "HTTP_422_UNPROCESSABLE_CONTENT", status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
+        raise HTTPException(status_code=unprocessable_status, detail=str(error)) from error
     except PersistenceError as error:
         session.rollback()
         status_code = (

@@ -52,7 +52,8 @@ class EntityRegistry:
     @staticmethod
     def _validate_properties(properties: dict, template: EntityTemplate) -> None:
         missing = [
-            name for name, definition in template.properties.items()
+            name
+            for name, definition in template.properties.items()
             if definition.required and name not in properties
         ]
         if missing:

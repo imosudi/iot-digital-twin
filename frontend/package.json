@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
+    "bootstrap": "^5.3.8",
     "vite": "^5.4.14",
     "typescript": "latest",
     "react": "latest",

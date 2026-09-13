@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from sqlalchemy import delete
 
+from app.config import settings
 from app.main import app, registry
 from app.persistence.database import SessionLocal
 from app.persistence.models import EntityRecord, RelationshipRecord, SiteRecord, TemplateRecord
@@ -22,6 +23,32 @@ def setup_function() -> None:
 def test_health_and_readiness() -> None:
     assert client.get("/health").json() == {"status": "ok"}
     assert client.get("/ready").json() == {"status": "ready"}
+
+
+def test_root_metadata_and_headers() -> None:
+    response = client.get("/")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["service"] == "TwinField Digital Twin API"
+    assert data["status"] == "ok"
+    assert data["version"] == "0.1.0"
+    assert "X-Process-Time" in response.headers
+
+
+def test_cors_headers() -> None:
+    headers = {
+        "Origin": "http://localhost:5173",
+        "Access-Control-Request-Method": "GET",
+    }
+    response = client.options("/health", headers=headers)
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+def test_config_settings() -> None:
+    assert settings.api_port == 9000
+    assert "http://localhost:5173" in settings.cors_origins
+    assert settings.env == "development"
 
 
 def test_registered_template_creates_generic_entity() -> None:
@@ -108,3 +135,26 @@ def test_site_entities_and_relationships_are_persisted() -> None:
     persisted = client.get("/api/v1/entities/inverter-01")
     assert persisted.status_code == 200
     assert persisted.json()["site_id"] == "north-ridge"
+
+
+def test_error_handling_entity_and_site_not_found() -> None:
+    assert client.get("/api/v1/entities/non-existent-id").status_code == 404
+
+    # Post entity pointing to invalid site
+    template = {
+        "type": "meter",
+        "version": "1.0",
+        "display_name": "Electric Meter",
+    }
+    client.post("/api/v1/templates", json=template)
+    res = client.post(
+        "/api/v1/entities",
+        json={
+            "site_id": "non-existent-site",
+            "type": "meter",
+            "name": "Meter 01",
+            "template": "meter",
+            "version": "1.0",
+        },
+    )
+    assert res.status_code == 404
