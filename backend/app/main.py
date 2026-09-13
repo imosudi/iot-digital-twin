@@ -1,3 +1,6 @@
+import os
+from fastapi.responses import FileResponse, Response
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from typing import Any
 import time
 
@@ -35,11 +38,51 @@ from app.services.persistence import (
 )
 from app.services.registry import EntityRegistry, RegistryError
 
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+FAVICON_ICO_PATH = os.path.join(STATIC_DIR, "favicon.ico")
+FAVICON_SVG_PATH = os.path.join(STATIC_DIR, "favicon.svg")
+
+FAVICON_FALLBACK_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#0f766e"/>
+  <text x="32" y="43" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="-0.5">DT</text>
+</svg>"""
+
 app = FastAPI(
-    title="TwinField — REGENOVA Digital Twin API",
-    version="0.1.0",
+    title="TwinField — REGENOVA Digital Twin Sub-API",
+    version="0.3.0",
     description="Dedicated Digital Twin sub-API for the REGENOVA Framework.",
+    docs_url=None,
+    redoc_url=None,
 )
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} - Swagger UI",
+        swagger_favicon_url="/favicon.ico",
+    )
+
+@app.get("/redoc", include_in_schema=False)
+async def custom_redoc_ui():
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} - ReDoc",
+        redoc_favicon_url="/favicon.ico",
+    )
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon_ico():
+    if os.path.exists(FAVICON_ICO_PATH):
+        return FileResponse(FAVICON_ICO_PATH, media_type="image/x-icon")
+    return Response(content=FAVICON_FALLBACK_SVG, media_type="image/svg+xml")
+
+@app.get("/favicon.svg", include_in_schema=False)
+def favicon_svg():
+    if os.path.exists(FAVICON_SVG_PATH):
+        return FileResponse(FAVICON_SVG_PATH, media_type="image/svg+xml")
+    return Response(content=FAVICON_FALLBACK_SVG, media_type="image/svg+xml")
+
 
 app.include_router(twins_router)
 app.add_middleware(
