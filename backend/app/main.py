@@ -71,13 +71,13 @@ async def custom_redoc_ui():
         redoc_favicon_url="/favicon.ico",
     )
 
-@app.get("/favicon.ico", include_in_schema=False)
+@app.api_route("/favicon.ico", methods=["GET", "HEAD"], include_in_schema=False)
 def favicon_ico():
     if os.path.exists(FAVICON_ICO_PATH):
         return FileResponse(FAVICON_ICO_PATH, media_type="image/x-icon")
     return Response(content=FAVICON_FALLBACK_SVG, media_type="image/svg+xml")
 
-@app.get("/favicon.svg", include_in_schema=False)
+@app.api_route("/favicon.svg", methods=["GET", "HEAD"], include_in_schema=False)
 def favicon_svg():
     if os.path.exists(FAVICON_SVG_PATH):
         return FileResponse(FAVICON_SVG_PATH, media_type="image/svg+xml")
