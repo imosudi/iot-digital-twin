@@ -1,3 +1,4 @@
+from typing import Any
 import time
 
 from fastapi import Depends, FastAPI, HTTPException, Query, status
@@ -67,13 +68,38 @@ with SessionLocal() as session:
 
 
 @app.get("/")
-def root() -> dict[str, str]:
+def root() -> dict[str, Any]:
     return {
-        "service": "TwinField Digital Twin API",
-        "status": "ok",
-        "version": "0.1.0",
-        "docs": "/docs",
-        "health": "/health",
+        "service": "TwinField — REGENOVA Digital Twin Sub-API",
+        "framework": "REGENOVA (incorporating REAMP Engine Architecture)",
+        "status": "healthy",
+        "version": "0.3.0",
+        "api_endpoint": "https://twinfield.regenova.cloud/",
+        "docs": "https://twinfield.regenova.cloud/docs",
+        "openapi": "https://twinfield.regenova.cloud/openapi.json",
+        "health": "https://twinfield.regenova.cloud/health",
+        "ready": "https://twinfield.regenova.cloud/ready",
+        "endpoints": [
+            "/api/v1/twins",
+            "/api/v1/twins/{twin_id}",
+            "/api/v1/twins/{twin_id}/transition",
+            "/api/v1/twins/{twin_id}/telemetry",
+            "/api/v1/twins/{twin_id}/predict",
+            "/api/v1/entities",
+            "/api/v1/entities/{entity_id}",
+            "/api/v1/sites",
+            "/api/v1/relationships",
+            "/api/v1/templates",
+            "/health",
+            "/ready",
+            "/docs",
+            "/openapi.json"
+        ],
+        "integrated_portals": {
+            "operations_portal": "https://regenova.cloud/portal.html",
+            "superadmin_backoffice": "https://backoffice.regenova.cloud/",
+            "framework_home": "https://regenova.cloud/"
+        }
     }
 
 
